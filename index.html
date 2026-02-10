@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamilnadu Taxi Tours and Travels</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Hind+Madurai:wght@400;700&family=Hind:wght@400;700&family=Noto+Sans+Telugu:wght@400;700;900&family=Noto+Sans+Kannada:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script>
+      window.process = window.process || { env: {} };
+      
+      window.tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              geevee: {
+                orange: '#F37021',
+                dark: '#0a0a0a',
+                slate: '#1e293b'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'Hind Madurai', 'Hind', 'Noto Sans Telugu', 'Noto Sans Kannada', 'sans-serif'],
+              tamil: ['Hind Madurai', 'sans-serif'],
+              hindi: ['Hind', 'sans-serif'],
+              telugu: ['Noto Sans Telugu', 'sans-serif'],
+              kannada: ['Noto Sans Kannada', 'sans-serif']
+            },
+            animation: {
+              'subtle-zoom': 'zoomIn 20s ease-out forwards',
+              'float': 'float 6s ease-in-out infinite',
+              'slide-up': 'slideUp 0.6s ease-out forwards',
+              'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
+            },
+            keyframes: {
+              pulseSoft: {
+                '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                '50%': { opacity: 0.8, transform: 'scale(1.02)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'Hind Madurai', 'Hind', 'Noto Sans Telugu', 'Noto Sans Kannada', sans-serif;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #F37021;
+          border-radius: 10px;
+          border: 2px solid #0a0a0a;
+        }
+
+        /* Luxury Gold */
+        .text-luxury-gold {
+          background: linear-gradient(to bottom, #fffde7 0%, #fff59d 50%, #fbc02d 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.95)) drop-shadow(-1px -1px 0px rgba(0,0,0,0.5));
+          font-weight: 900;
+        }
+
+        /* Sandalwood Panel */
+        .wood-panel-container {
+          background-color: #f7e7ce;
+          background-image: 
+            linear-gradient(90deg, transparent 50%, rgba(184, 134, 11, 0.05) 50%),
+            linear-gradient(rgba(184, 134, 11, 0.05) 50%, transparent 50%);
+          background-size: 4px 4px;
+          border: 10px solid #d2b48c;
+          box-shadow: 
+            0 50px 100px -20px rgba(0,0,0,0.6),
+            inset 0 0 80px rgba(184, 134, 11, 0.1);
+          border-radius: 2rem;
+          overflow: hidden;
+        }
+
+        .wood-plank {
+          background: linear-gradient(to right, 
+            #f7e7ce 0%, 
+            #fdf5e6 20%, 
+            #f7e7ce 40%, 
+            #fdf5e6 60%, 
+            #f7e7ce 80%, 
+            #fdf5e6 100%
+          );
+          position: relative;
+          border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Inlay Text */
+        .golden-inlay-text {
+          background: linear-gradient(to bottom, #fffde7 0%, #fff59d 50%, #fbc02d 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.95)) drop-shadow(-1px -1px 0px rgba(0,0,0,0.95));
+          font-weight: 900;
+          letter-spacing: -0.01em;
+          position: relative;
+          display: inline-block;
+          line-height: 1.4;
+        }
+
+        .iron-nail {
+          width: 12px;
+          height: 12px;
+          background: radial-gradient(circle at 30% 30%, #e6b800, #996600);
+          border-radius: 50%;
+          box-shadow: 1px 1px 3px rgba(0,0,0,0.2), inset -1px -1px 2px rgba(255,255,255,0.3);
+        }
+
+        .glass-panel {
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .shadow-3xl {
+          box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .hover-lift {
+          transition: transform 0.3s ease-out;
+        }
+        .hover-lift:hover {
+          transform: translateY(-5px);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "leaflet": "https://esm.sh/leaflet@^1.9.4"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
